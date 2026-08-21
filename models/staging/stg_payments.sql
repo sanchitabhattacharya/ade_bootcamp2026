@@ -1,3 +1,10 @@
+{{
+    config(
+        materialized='view',
+        schema='DBT_STAGE'
+    )
+}}
+
 with source as (
 
     select * from {{ source('lnd_sb_schema', 'payments') }}
