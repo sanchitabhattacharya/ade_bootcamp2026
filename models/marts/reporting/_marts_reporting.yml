@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: mart_hotel_performance
+    description: One row per hotel with booking, revenue, and review metrics. Powers the hotel performance dashboard.
+    columns:
+      - name: hotel_id
+        tests:
+          - unique
+          - not_null
+
+  - name: mart_customer_ltv
+    description: One row per customer with lifetime value and booking history. Powers the customer analytics dashboard.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
