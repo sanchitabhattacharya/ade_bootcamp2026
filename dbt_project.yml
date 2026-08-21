@@ -32,17 +32,17 @@ models:
     # ---- SILVER: intermediate --------------------------------------------
     # Now a real VIEW (not ephemeral) since it has its own dedicated
     # schema (DBT_INTR) and the team wants to query it directly for debugging.
-    # intermediate:
-    #   +materialized: view
-    #   +schema: DBT_INTR
+    intermediate:
+      +materialized: view
+      +schema: DBT_INTR
 
-    # # ---- GOLD: marts ------------------------------------------------------
-    # # core and reporting both land in the single DBT_MART schema.
-    # marts:
-    #   core:
-    #     +materialized: table
-    #     +schema: DBT_MART
-    #   reporting:
-    #     +materialized: table
-    #     +schema: DBT_MART
+    # ---- GOLD: marts ------------------------------------------------------
+    # core and reporting both land in the single DBT_MART schema.
+    marts:
+      core:
+        +materialized: table
+        +schema: DBT_MART
+      reporting:
+        +materialized: table
+        +schema: DBT_MART
         # fct_bookings overrides this to `incremental` in its own config block

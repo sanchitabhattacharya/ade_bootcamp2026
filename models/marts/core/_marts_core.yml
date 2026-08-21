@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: dim_hotels
+    description: One row per hotel. Gold-layer dimension table.
+    columns:
+      - name: hotel_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_customers
+    description: One row per customer. Gold-layer dimension table.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_bookings
+    description: >
+      One row per booking. Gold-layer fact table, incrementally loaded.
+      This is the primary table BI tools and reporting marts join against.
+    columns:
+      - name: booking_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: hotel_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_hotels')
+                field: hotel_id
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: booking_amount
+        tests:
+          - not_null
