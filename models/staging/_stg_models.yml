@@ -1,0 +1,109 @@
+version: 2
+
+models:
+  - name: stg_hotels
+    description: Cleaned, 1:1 staging model over the raw hotels table.
+    columns:
+      - name: hotel_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: star_rating
+        description: Hotel star rating, 1-5.
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+
+  - name: stg_customers
+    description: Cleaned, 1:1 staging model over the raw customers table.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: email
+        description: Lowercased customer email.
+        tests:
+          - not_null
+
+  - name: stg_bookings
+    description: Cleaned, 1:1 staging model over the raw bookings table.
+    columns:
+      - name: booking_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: hotel_id
+        description: Foreign key to stg_hotels.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_hotels')
+                field: hotel_id
+      - name: customer_id
+        description: Foreign key to stg_customers.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: booking_status
+        description: One of confirmed, completed, cancelled.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['confirmed', 'completed', 'cancelled']
+      - name: booking_amount
+        description: Total booking value in INR.
+        tests:
+          - not_null
+    tests:
+      # dbt_utils generic test applied at the model level (not a single column)
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "check_out_date > check_in_date"
+
+  - name: stg_payments
+    description: Cleaned, 1:1 staging model over the raw payments table.
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: booking_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_bookings')
+                field: booking_id
+      - name: payment_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['success', 'failed', 'refunded']
+
+  - name: stg_reviews
+    description: Cleaned, 1:1 staging model over the raw reviews table.
+    columns:
+      - name: review_id
+        tests:
+          - unique
+          - not_null
+      - name: booking_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_bookings')
+                field: booking_id
+      - name: rating
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]

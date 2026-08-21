@@ -1,0 +1,67 @@
+version: 2
+
+sources:
+  - name: lnd_sb_schema
+    description: >
+      Raw landing tables loaded into Snowflake by the upstream ingestion
+      process. dbt never writes to these — read-only.
+      NOTE: the source name below (`lnd_sb_schema`) is just a logical dbt
+      identifier used in every staging model's source('lnd_sb_schema', ...)
+      call — it does NOT need to match the physical Snowflake schema name.
+      The physical location is only ever set here, via database/schema.
+    database: SANDBOX
+    schema: DBT_RAW
+    config:
+      freshness:
+        loaded_at_field: created_at
+        warn_after: {count: 24, period: hour}
+        error_after: {count: 48, period: hour}
+
+    tables:
+      - name: hotels
+        description: One row per hotel property.
+        columns:
+          - name: hotel_id
+            description: Primary key.
+            tests:
+              - unique
+              - not_null
+
+      - name: customers
+        description: One row per customer.
+        columns:
+          - name: customer_id
+            description: Primary key.
+            tests:
+              - unique
+              - not_null
+
+      - name: bookings
+        description: One row per booking transaction.
+        config:
+          freshness:
+            loaded_at_field: created_at
+            warn_after: {count: 12, period: hour}
+            error_after: {count: 24, period: hour}
+        columns:
+          - name: booking_id
+            description: Primary key.
+            tests:
+              - unique
+              - not_null
+
+      - name: payments
+        description: One row per payment attempt against a booking.
+        columns:
+          - name: payment_id
+            tests:
+              - unique
+              - not_null
+
+      - name: reviews
+        description: One row per customer review, tied to a completed booking.
+        columns:
+          - name: review_id
+            tests:
+              - unique
+              - not_null

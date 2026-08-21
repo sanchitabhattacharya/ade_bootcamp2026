@@ -1,0 +1,48 @@
+name: 'hotel_booking_training'
+version: '1.0.0'
+config-version: 2
+
+# Must match the profile name in ~/.dbt/profiles.yml (or the dbt Cloud connection)
+profile: 'hotel_booking_training'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  # Used by staging models to filter out test/dummy bookings if needed later
+  earliest_booking_date: '2020-01-01'
+
+models:
+  hotel_booking_training:
+
+    # ---- BRONZE: staging -------------------------------------------------
+    # 1:1 with source tables. Views only — cheap, always fresh, no storage cost.
+    staging:
+      +materialized: view
+      +schema: DBT_STAGE
+
+    # ---- SILVER: intermediate --------------------------------------------
+    # Now a real VIEW (not ephemeral) since it has its own dedicated
+    # schema (DBT_INTR) and the team wants to query it directly for debugging.
+    # intermediate:
+    #   +materialized: view
+    #   +schema: DBT_INTR
+
+    # # ---- GOLD: marts ------------------------------------------------------
+    # # core and reporting both land in the single DBT_MART schema.
+    # marts:
+    #   core:
+    #     +materialized: table
+    #     +schema: DBT_MART
+    #   reporting:
+    #     +materialized: table
+    #     +schema: DBT_MART
+        # fct_bookings overrides this to `incremental` in its own config block

@@ -1,0 +1,4 @@
+payment_method,display_name,is_digital
+card,Credit / Debit Card,true
+upi,UPI,true
+netbanking,Net Banking,true
